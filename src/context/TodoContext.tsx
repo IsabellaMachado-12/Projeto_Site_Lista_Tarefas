@@ -20,6 +20,7 @@ interface TodoContextType {
   user: { name: string; email: string } | null;
   login: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (email: string, password: string, name: string) => Promise<{ error: string | null }>;
+  loginWithGoogle: () => Promise<{ error: string | null }>;
   logout: () => Promise<void>;
   loading: boolean;
   transactions: FinanceTransaction[];
@@ -198,6 +199,19 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         data: {
           name,
         },
+      },
+    });
+    if (error) {
+      return { error: error.message };
+    }
+    return { error: null };
+  };
+
+  const loginWithGoogle = async (): Promise<{ error: string | null }> => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin,
       },
     });
     if (error) {
@@ -441,6 +455,7 @@ export const TodoProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         login,
         signUp,
+        loginWithGoogle,
         logout,
         loading,
         transactions,
